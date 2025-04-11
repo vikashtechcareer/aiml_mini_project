@@ -58,7 +58,6 @@ def preprocess_titanic(df):
 
 def train_models(X_train, y_train, output_dir):
     models = {
-        "random_forest": RandomForestClassifier(),
         "svm": SVC(probability=True),
         "gb": GradientBoostingClassifier(),
         "xgboost": XGBClassifier(use_label_encoder=False, eval_metric="logloss")
