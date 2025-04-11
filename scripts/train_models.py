@@ -61,8 +61,7 @@ def train_models(X_train, y_train, output_dir):
         "random_forest": RandomForestClassifier(),
         "svm": SVC(probability=True),
         "gb": GradientBoostingClassifier(),
-        "xgboost": XGBClassifier(use_label_encoder=False, eval_metric="logloss"),
-        "knn": KNeighborsClassifier()
+        "xgboost": XGBClassifier(use_label_encoder=False, eval_metric="logloss")
     }
 
     os.makedirs(output_dir, exist_ok=True)
