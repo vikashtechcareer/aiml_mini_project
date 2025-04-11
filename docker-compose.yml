@@ -6,8 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile.trainer
     volumes:
-      - ./models:/app/models
-      - ./data:/app/data
+      - ./models:models
+      - ./data:data
     command: ["python", "scripts/train_models.py"]
     restart: "no"
 
@@ -20,5 +20,5 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./models:/app/models
+      - ./models:models
     restart: always
