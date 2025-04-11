@@ -38,7 +38,7 @@ jobs:
 
       - name: 🔐 Log in to DockerHub
         run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker login -u $DOCKER_USER --password-stdin $DOCKER_PASS
 
       - name: 🚀 Push Docker image to Docker Hub
         run: docker push $DOCKER_USER/$IMAGE_NAME:latest
