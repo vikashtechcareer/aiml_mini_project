@@ -33,11 +33,15 @@ jobs:
           python scripts/train_models.py
 
       - name: 📸 Build Docker image
-        run: |
-          docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          dockerfile: Dockerfile
+          push: false
+          tags: $DOCKER_USER/$IMAGE_NAME:latest .
 
       - name: 🔐 Log in to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: $DOCKER_USER
           password: $DOCKER_PASS
