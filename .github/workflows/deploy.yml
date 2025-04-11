@@ -34,10 +34,10 @@ jobs:
 
       - name: 📸 Build Docker image
         run: |
-          docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
+          docker build -t "${{secrets.DOCKER_USERNAME}}"/$IMAGE_NAME:latest .
 
       - name: 🔐 Log in to DockerHub
-        run: echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+        run: echo "${{secrets.DOCKER_USERNAME}}" | docker login -u "${{secrets.DOCKER_USERNAME}}" --password-stdin
 
       - name: 🚀 Push Docker image to Docker Hub
         run: docker push $DOCKER_USER/$IMAGE_NAME:latest
