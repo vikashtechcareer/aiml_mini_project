@@ -10,7 +10,6 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
 import joblib
 
 # ---------------------------
@@ -63,7 +62,6 @@ def train_models(X_train, y_train, output_dir):
         "svm": SVC(probability=True),
         "gb": GradientBoostingClassifier(),
         "xgboost": XGBClassifier(use_label_encoder=False, eval_metric="logloss"),
-        "lightgbm": LGBMClassifier(),
         "knn": KNeighborsClassifier(),
         "decision_tree": DecisionTreeClassifier(),
     }
