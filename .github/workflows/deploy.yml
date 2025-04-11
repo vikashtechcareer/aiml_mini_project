@@ -41,7 +41,7 @@ jobs:
         with:
           registry: ghcr.io
           username: $DOCKER_USER
-          pasword: ${{secrets.DOCKER_SECRET}}
+          password: ${{secrets.DOCKER_SECRET}}
 
       - name: 🚀 Push Docker image to Docker Hub
         run: docker push $DOCKER_USER/$IMAGE_NAME:latest
