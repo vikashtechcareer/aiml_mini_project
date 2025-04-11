@@ -1,0 +1,43 @@
+# .github/workflows/deploy.yml
+name: Train and Deploy Flask API
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+      IMAGE_NAME: ml-ab-canary-api
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 📦 Install Python dependencies
+        run: |
+          pip install -r app/requirements.txt
+
+      - name: 🧠 Run training script
+        run: |
+          mkdir -p models/iris_models models/titanic_models
+          python scripts/train_models.py
+
+      - name: 📸 Build Docker image
+        run: |
+          docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
+
+      - name: 🔐 Log in to DockerHub
+        run: echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+
+      - name: 🚀 Push Docker image to Docker Hub
+        run: docker push $DOCKER_USER/$IMAGE_NAME:latest
