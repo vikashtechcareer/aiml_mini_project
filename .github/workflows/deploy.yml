@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASS: ${{ secrets.DOCKER_SECRET_MAIN }}
+      DOCKER_USER: ${{secrets.DOCKER_USERNAME}}
+      DOCKER_PASS: ${{secrets.DOCKER_SECRET}}
       IMAGE_NAME: ml_canary_ab_api
 
     steps:
@@ -37,10 +37,8 @@ jobs:
           docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
 
       - name: 🔐 Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
 
       - name: 🚀 Push Docker image to Docker Hub
         run: docker push $DOCKER_USER/$IMAGE_NAME:latest
