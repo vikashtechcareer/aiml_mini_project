@@ -37,8 +37,11 @@ jobs:
           docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
 
       - name: 🔐 Log in to DockerHub
-        run: |
-          docker login -u $DOCKER_USER --password-stdin $DOCKER_PASS
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: $DOCKER_USER
+          pasword: $DOCKER_PASS
 
       - name: 🚀 Push Docker image to Docker Hub
         run: docker push $DOCKER_USER/$IMAGE_NAME:latest
