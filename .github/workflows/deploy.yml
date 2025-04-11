@@ -12,7 +12,7 @@ jobs:
     env:
       DOCKER_USER: ${{ secrets.DOCKER_USER }}
       DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-      IMAGE_NAME: ml-ab-canary-api
+      IMAGE_NAME: ml_canary_ab_api
 
     steps:
       - name: ⬇️ Checkout code
