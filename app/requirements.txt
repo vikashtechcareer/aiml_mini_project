@@ -4,3 +4,4 @@ xgboost
 lightgbm
 joblib
 pandas
+seaborn

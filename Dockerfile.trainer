@@ -7,4 +7,5 @@ COPY app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY scripts/ scripts/
-COPY models/ models/  # Ensure folder exists for output
+RUN python scripts/train_and_download.py
+RUN python scripts/evaluate_models.py

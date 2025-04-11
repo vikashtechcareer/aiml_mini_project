@@ -1,9 +1,22 @@
-# docker-compose.yml
 version: '3.9'
 
 services:
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile.trainer
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    command: ["python", "scripts/train_models.py"]
+    restart: "no"
+
   flask-api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - trainer
     ports:
       - "5000:5000"
     volumes:

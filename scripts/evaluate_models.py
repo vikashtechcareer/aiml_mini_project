@@ -1,31 +1,75 @@
 # scripts/evaluate_models.py
-import joblib
+
 import os
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-from scripts.model_utils import load_iris, load_titanic
 import pandas as pd
+import joblib
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.datasets import load_iris
+import seaborn as sns
+from sklearn.model_selection import train_test_split
 
-def evaluate(dataset_name):
-    X_train, X_test, y_train, y_test = (load_iris() if dataset_name == 'iris' else load_titanic())
-    report = []
-    model_dir = f"models/{dataset_name}_models"
+# ---------- Preprocessing ----------
 
-    for model_file in os.listdir(model_dir):
-        model_name = model_file.split('.')[0]
-        model = joblib.load(f"{model_dir}/{model_file}")
-        y_pred = model.predict(X_test)
-        report.append({
-            "Model": model_name,
-            "Dataset": dataset_name,
-            "Accuracy": accuracy_score(y_test, y_pred),
-            "Precision": precision_score(y_test, y_pred, average='macro'),
-            "Recall": recall_score(y_test, y_pred, average='macro'),
-            "F1 Score": f1_score(y_test, y_pred, average='macro')
-        })
-    return report
+def preprocess_iris(df):
+    X = df.drop("target", axis=1)
+    y = df["target"]
+    return train_test_split(X, y, test_size=0.2, random_state=42)
+
+def preprocess_titanic(df):
+    df = df.drop(columns=["name", "ticket", "cabin"], errors="ignore")
+    df["sex"] = df["sex"].map({"male": 1, "female": 0})
+    df["embarked"] = df["embarked"].map({"S": 0, "C": 1, "Q": 2})
+    df.fillna(df.mean(numeric_only=True), inplace=True)
+    df = df.dropna()
+
+    X = df.drop("survived", axis=1)
+    y = df["survived"]
+    return train_test_split(X, y, test_size=0.2, random_state=42)
+
+# ---------- Evaluation ----------
+
+def evaluate_model(name, model, X_test, y_test):
+    y_pred = model.predict(X_test)
+    return {
+        "model": name,
+        "accuracy": accuracy_score(y_test, y_pred),
+        "precision": precision_score(y_test, y_pred, average="weighted", zero_division=0),
+        "recall": recall_score(y_test, y_pred, average="weighted", zero_division=0),
+        "f1_score": f1_score(y_test, y_pred, average="weighted", zero_division=0),
+    }
+
+def evaluate_all_models(model_dir, X_test, y_test):
+    results = []
+    for file in os.listdir(model_dir):
+        if file.endswith(".joblib"):
+            model_path = os.path.join(model_dir, file)
+            model_name = file.replace(".joblib", "")
+            model = joblib.load(model_path)
+            print(f"🔍 Evaluating: {model_name}")
+            metrics = evaluate_model(model_name, model, X_test, y_test)
+            results.append(metrics)
+    return results
+
+# ---------- Main Script ----------
 
 if __name__ == "__main__":
-    iris_report = evaluate("iris")
-    titanic_report = evaluate("titanic")
-    final = iris_report + titanic_report
-    pd.DataFrame(final).to_csv("report/model_performance.csv", index=False)
+    os.makedirs("reports", exist_ok=True)
+
+    # Load Iris data
+    print("📊 Evaluating Iris models...")
+    iris = load_iris(as_frame=True)
+    iris_df = iris.frame
+    X_train, X_test, y_train, y_test = preprocess_iris(iris_df)
+    iris_results = evaluate_all_models("models/iris_models", X_test, y_test)
+    iris_df_result = pd.DataFrame(iris_results)
+    iris_df_result.to_csv("reports/iris_model_report.csv", index=False)
+    print("✅ Saved Iris report to reports/iris_model_report.csv")
+
+    # Load Titanic data
+    print("📊 Evaluating Titanic models...")
+    titanic_df = sns.load_dataset("titanic")
+    X_train, X_test, y_train, y_test = preprocess_titanic(titanic_df)
+    titanic_results = evaluate_all_models("models/titanic_models", X_test, y_test)
+    titanic_df_result = pd.DataFrame(titanic_results)
+    titanic_df_result.to_csv("reports/titanic_model_report.csv", index=False)
+    print("✅ Saved Titanic report to reports/titanic_model_report.csv")
